@@ -1,12 +1,43 @@
-var mammoth = require("mammoth");
+(function() {
+    document.getElementById('document')
+        .addEventListener('change', handleFileSelect, false);
+        
+    function handleFileSelect(event) {
+        readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
+            mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+                .then(displayResult)
+                .done();
+        });
+    }
+    
+    function displayResult(result) {
+        document.getElementById('output').innerHTML = result.value;
+        
+        var messageHtml = result.messages.map(function(message) {
+            return '<li class="' + message.type + '">' + escapeHtml(message.message) + '</li>';
+        }).join('');
+        
+        document.getElementById('messages').innerHTML = '<ul>' + messageHtml + '</ul>';
+    }
+    
+    function readFileInputEventAsArrayBuffer(event, callback) {
+        var file = event.target.files[0];
 
-mammoth.convertToHtml({ path:"path/to/document.docx" })
-    .then(function(results) {
-        "use strict";
-        var html = result.value; // The generated HTML
-        var messages = result.messages; // Any messages, such as warnings during conversion
+        var reader = new FileReader();
+        
+        reader.onload = function(loadEvent) {
+            var arrayBuffer = loadEvent.target.result;
+            callback(arrayBuffer);
+        };
+        
+        reader.readAsArrayBuffer(file);
+    }
 
-        console.log(html); 
-        console.log(messages);
-    })
-    .done();
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+})();
