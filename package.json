@@ -42,5 +42,10 @@
         "single"
       ]
     }
+  },
+  "dependencies": {
+    "gulp-docx": "^1.0.0",
+    "mammoth": "^1.3.3",
+    "tinymce": "^4.5.5"
   }
 }
